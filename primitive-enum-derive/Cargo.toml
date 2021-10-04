@@ -1,0 +1,21 @@
+[package]
+name = "primitive-enum-derive"
+version = "0.1.0"
+authors = ["Rail Khusnutdinov <mail@rail-ka.ru>"]
+description = "macros for get primitive enum from complex"
+keywords = ["enum"]
+categories = []
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/libfunc/primitive-enum/"
+documentation = "https://docs.rs/primitive-enum-derive/"
+repository = "https://github.com/libfunc/primitive-enum-derive/"
+readme = "README.md"
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "1"
+proc-macro2 = "1.0"
+syn = { version = "1", features = ["full"] }
