@@ -153,8 +153,8 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 }
 
                 let gen = quote! {
-                    impl #name {
-                        pub fn from_u8(u: u8) -> Self {
+                    impl From<u8> for #name {
+                        fn from(u: u8) -> Self {
                             #(#variants)*
                             else {
                                 panic!("ReprU8Enum from_u8 undefined value");
