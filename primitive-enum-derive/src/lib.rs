@@ -116,3 +116,60 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
         }
     }
 }
+
+#[proc_macro_derive(ReprU8Enum, attributes(coming))]
+pub fn derive_repr_u8_enum(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = parse_macro_input!(stream as DeriveInput);
+
+    let name = &ast.ident;
+    let data = &ast.data;
+
+    match data {
+        Data::Enum(data_enum) => {
+            let is_simple_enum = data_enum.variants.iter().all(|item| item.fields.is_empty());
+            if is_simple_enum {
+                let mut variants: Vec<TokenStream> =
+                    Vec::with_capacity(data_enum.variants.len());
+
+                let mut is_first = true;
+
+                for variant in &data_enum.variants {
+                    let ident = &variant.ident;
+                    let var = if is_first {
+                        is_first = false;
+                        quote! {
+                            if v == #name::#ident as u8 {
+                                #name::#ident
+                            }
+                        }
+                    } else {
+                        quote! {
+                            else if v == #name::#ident as u8 {
+                                #name::#ident
+                            }
+                        }
+                    };
+                    variants.push(var);
+                }
+
+                let gen = quote! {
+                    impl #name {
+                        fn from_u8(u: u8) -> Self {
+                            #(#variants)*
+                            else {
+                                panic!("ReprU8Enum from_u8 undefined value");
+                            }
+                        }
+                    }
+                };
+                proc_macro::TokenStream::from(gen)
+            } else {
+                panic!("ReprU8Enum only for simple enum allow (without nested data)");
+            }
+        }
+        _ => {
+            panic!("ReprU8Enum only for enum allow");
+        }
+    }
+}
+
