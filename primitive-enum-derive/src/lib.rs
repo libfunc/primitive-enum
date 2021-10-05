@@ -117,8 +117,8 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
     }
 }
 
-#[proc_macro_derive(ReprU8Enum, attributes(coming))]
-pub fn derive_repr_u8_enum(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+#[proc_macro_derive(FromU8, attributes(coming))]
+pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(stream as DeriveInput);
 
     let name = &ast.ident;
@@ -138,13 +138,13 @@ pub fn derive_repr_u8_enum(stream: proc_macro::TokenStream) -> proc_macro::Token
                     let var = if is_first {
                         is_first = false;
                         quote! {
-                            if v == #name::#ident as u8 {
+                            if u == #name::#ident as u8 {
                                 #name::#ident
                             }
                         }
                     } else {
                         quote! {
-                            else if v == #name::#ident as u8 {
+                            else if u == #name::#ident as u8 {
                                 #name::#ident
                             }
                         }
@@ -154,7 +154,7 @@ pub fn derive_repr_u8_enum(stream: proc_macro::TokenStream) -> proc_macro::Token
 
                 let gen = quote! {
                     impl #name {
-                        fn from_u8(u: u8) -> Self {
+                        pub fn from_u8(u: u8) -> Self {
                             #(#variants)*
                             else {
                                 panic!("ReprU8Enum from_u8 undefined value");
