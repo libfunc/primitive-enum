@@ -1,4 +1,4 @@
-pub use primitive_enum_derive::PrimitiveFromEnum;
+pub use primitive_enum_derive::{PrimitiveFromEnum, FromU8};
 
 /**
 Need for complex Enums, which includes other data:
