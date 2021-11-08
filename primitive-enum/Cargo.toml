@@ -10,7 +10,7 @@ homepage = "https://github.com/libfunc/primitive-enum/"
 documentation = "https://docs.rs/primitive-enum/"
 repository = "https://github.com/libfunc/primitive-enum/"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "primitive_enum"
