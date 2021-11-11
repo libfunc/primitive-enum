@@ -138,13 +138,13 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     let var = if is_first {
                         is_first = false;
                         quote! {
-                            if u == #name::#ident as u8 {
+                            if #name::#ident == u {
                                 #name::#ident
                             }
                         }
                     } else {
                         quote! {
-                            else if u == #name::#ident as u8 {
+                            else if #name::#ident == u {
                                 #name::#ident
                             }
                         }

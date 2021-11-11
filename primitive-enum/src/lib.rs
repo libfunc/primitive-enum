@@ -17,7 +17,7 @@ enum Primitive {
 PrimitiveEnum should be equivalent for Complex, but without variants inner data
  */
 pub trait PrimitiveFromEnum {
-    type PrimitiveEnum;
+    type PrimitiveEnum: PartialEq<u8> + From<u8>;
 
     fn get_primitive_enum(&self) -> Self::PrimitiveEnum;
 
