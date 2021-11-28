@@ -153,22 +153,27 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 }
 
                 let gen = quote! {
+                    impl PartialEq<u8> for #name {
+                        fn eq(&self, other: &u8) -> bool {
+                            *self as u8 == *other
+                        }
+                    }
                     impl From<u8> for #name {
                         fn from(u: u8) -> Self {
                             #(#variants)*
                             else {
-                                panic!("ReprU8Enum from_u8 undefined value");
+                                panic!("FromU8 from_u8 undefined value");
                             }
                         }
                     }
                 };
                 proc_macro::TokenStream::from(gen)
             } else {
-                panic!("ReprU8Enum only for simple enum allow (without nested data)");
+                panic!("FromU8 only for simple enum allow (without nested data)");
             }
         }
         _ => {
-            panic!("ReprU8Enum only for enum allow");
+            panic!("FromU8 only for enum allow");
         }
     }
 }
