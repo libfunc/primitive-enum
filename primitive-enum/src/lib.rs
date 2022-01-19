@@ -3,11 +3,14 @@ pub use primitive_enum_derive::{PrimitiveFromEnum, FromU8};
 /**
 Need for complex Enums, which includes other data:
 ```
+#[derive(PrimitiveFromEnum)]
+#[coming(primitive = "Primitive")]
 enum Complex {
     A(String),
     B(u32),
     C
 }
+#[derive(FromU8)]
 enum Primitive {
     A,
     B,
