@@ -95,7 +95,7 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
                     .collect();
 
                 let gen = quote! {
-                    impl PrimitiveFromEnum for #name {
+                    impl primitive_enum::PrimitiveFromEnum for #name {
                         type PrimitiveEnum = #primitive_name;
                         fn get_primitive_enum(&self) -> Self::PrimitiveEnum {
                             match self {
@@ -122,6 +122,7 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let ast = parse_macro_input!(stream as DeriveInput);
 
     let name = &ast.ident;
+    let name_s = &ast.ident.to_string();
     let data = &ast.data;
 
     match data {
@@ -129,6 +130,8 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
             let is_simple_enum = data_enum.variants.iter().all(|item| item.fields.is_empty());
             if is_simple_enum {
                 let mut variants: Vec<TokenStream> =
+                    Vec::with_capacity(data_enum.variants.len());
+                let mut try_variants: Vec<TokenStream> =
                     Vec::with_capacity(data_enum.variants.len());
 
                 let mut is_first = true;
@@ -150,6 +153,9 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                         }
                     };
                     variants.push(var);
+                    try_variants.push(quote! {
+                            u if #name::#ident == u => Ok(#name::#ident),
+                        });
                 }
 
                 let gen = quote! {
@@ -158,11 +164,23 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                             *self as u8 == *other
                         }
                     }
-                    impl From<u8> for #name {
-                        fn from(u: u8) -> Self {
+                    impl primitive_enum::UnsafeFromU8 for #name {
+                        fn from_unsafe(u: u8) -> Self {
                             #(#variants)*
                             else {
-                                panic!("FromU8 from_u8 undefined value");
+                                panic!("UnsafeFromU8 from_unsafe undefined value: {}", u);
+                            }
+                        }
+                        fn name() -> &'static str {
+                            #name_s
+                        }
+                    }
+                    impl TryFrom<u8> for #name {
+                        type Error = primitive_enum::EnumFromU8Error;
+                        fn try_from(value: u8) -> Result<Self, Self::Error> {
+                            match value {
+                                #(#try_variants)*
+                                _ => Err(primitive_enum::EnumFromU8Error),
                             }
                         }
                     }

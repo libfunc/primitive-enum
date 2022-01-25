@@ -1,4 +1,6 @@
 pub use primitive_enum_derive::{PrimitiveFromEnum, FromU8};
+use std::error::Error;
+use std::fmt;
 
 /**
 Need for complex Enums, which includes other data:
@@ -20,9 +22,26 @@ enum Primitive {
 PrimitiveEnum should be equivalent for Complex, but without variants inner data
  */
 pub trait PrimitiveFromEnum {
-    type PrimitiveEnum: PartialEq<u8> + From<u8>;
+    type PrimitiveEnum: TryFrom<u8> + UnsafeFromU8;
 
     fn get_primitive_enum(&self) -> Self::PrimitiveEnum;
 
     fn primitive_name() -> &'static str;
 }
+
+pub trait UnsafeFromU8: PartialEq<u8> + Sized {
+    fn from_unsafe(_: u8) -> Self;
+
+    fn name() -> &'static str;
+}
+
+#[derive(Debug)]
+pub struct EnumFromU8Error;
+
+impl fmt::Display for EnumFromU8Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "EnumFromU8Error")
+    }
+}
+
+impl Error for EnumFromU8Error {}
