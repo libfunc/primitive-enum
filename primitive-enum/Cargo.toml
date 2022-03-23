@@ -17,10 +17,8 @@ name = "primitive_enum"
 path = "src/lib.rs"
 
 [features]
-# default = ["std"]
-default = []
+default = ["std"]
 std = []
-# no_std = []
 
 [dependencies.primitive-enum-derive]
 path = "../primitive-enum-derive"
