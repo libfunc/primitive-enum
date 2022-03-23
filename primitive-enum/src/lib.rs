@@ -1,6 +1,7 @@
-pub use primitive_enum_derive::{PrimitiveFromEnum, FromU8};
-use std::error::Error;
-use std::fmt;
+#![cfg_attr(not(feature = "std"), no_std)]
+pub use primitive_enum_derive::{FromU8, PrimitiveFromEnum};
+#[cfg(feature = "std")]
+use std::{error::Error, fmt};
 
 /**
 Need for complex Enums, which includes other data:
@@ -35,13 +36,15 @@ pub trait UnsafeFromU8: PartialEq<u8> + Sized {
     fn name() -> &'static str;
 }
 
-#[derive(Debug)]
+#[cfg_attr(feature = "std", derive(Debug))]
 pub struct EnumFromU8Error;
 
+#[cfg(feature = "std")]
 impl fmt::Display for EnumFromU8Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "EnumFromU8Error")
     }
 }
 
+#[cfg(feature = "std")]
 impl Error for EnumFromU8Error {}
