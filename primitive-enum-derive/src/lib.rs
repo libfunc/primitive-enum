@@ -2,11 +2,9 @@ extern crate proc_macro2;
 extern crate quote;
 extern crate syn;
 
-use proc_macro2::{TokenStream};
+use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{
-    parse_macro_input, Data, DeriveInput, Field, Fields, Ident, Lit, Meta,
-};
+use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, Ident, Lit, Meta};
 
 fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
     ast.attrs
@@ -129,8 +127,7 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
         Data::Enum(data_enum) => {
             let is_simple_enum = data_enum.variants.iter().all(|item| item.fields.is_empty());
             if is_simple_enum {
-                let mut variants: Vec<TokenStream> =
-                    Vec::with_capacity(data_enum.variants.len());
+                let mut variants: Vec<TokenStream> = Vec::with_capacity(data_enum.variants.len());
                 let mut try_variants: Vec<TokenStream> =
                     Vec::with_capacity(data_enum.variants.len());
 
@@ -154,8 +151,8 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     };
                     variants.push(var);
                     try_variants.push(quote! {
-                            u if #name::#ident == u => Ok(#name::#ident),
-                        });
+                        u if #name::#ident == u => Ok(#name::#ident),
+                    });
                 }
 
                 let gen = quote! {
@@ -175,7 +172,7 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                             #name_s
                         }
                     }
-                    impl TryFrom<u8> for #name {
+                    impl core::convert::TryFrom<u8> for #name {
                         type Error = primitive_enum::EnumFromU8Error;
                         fn try_from(value: u8) -> Result<Self, Self::Error> {
                             match value {
@@ -195,4 +192,3 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
         }
     }
 }
-
