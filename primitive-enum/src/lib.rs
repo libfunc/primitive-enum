@@ -27,12 +27,14 @@ pub trait PrimitiveFromEnum {
 
     fn get_primitive_enum(&self) -> Self::PrimitiveEnum;
 
+    /// get primitive enum name in string format
     fn primitive_name() -> &'static str;
 }
 
 pub trait UnsafeFromU8: PartialEq<u8> + Sized {
     fn from_unsafe(_: u8) -> Self;
 
+    // get enum name in string format
     fn name() -> &'static str;
 }
 

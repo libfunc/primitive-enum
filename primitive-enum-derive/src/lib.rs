@@ -95,11 +95,13 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
                 let gen = quote! {
                     impl primitive_enum::PrimitiveFromEnum for #name {
                         type PrimitiveEnum = #primitive_name;
+                        #[inline]
                         fn get_primitive_enum(&self) -> Self::PrimitiveEnum {
                             match self {
                                 #(#get_primitive_enum)*
                             }
                         }
+                        #[inline]
                         fn primitive_name() -> &'static str {
                             #primitive_name_s
                         }
@@ -162,12 +164,14 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                         }
                     }
                     impl primitive_enum::UnsafeFromU8 for #name {
+                        #[inline]
                         fn from_unsafe(u: u8) -> Self {
                             #(#variants)*
                             else {
                                 panic!("UnsafeFromU8 from_unsafe undefined value: {}", u);
                             }
                         }
+                        #[inline]
                         fn name() -> &'static str {
                             #name_s
                         }
