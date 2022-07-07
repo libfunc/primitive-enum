@@ -133,23 +133,10 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                 let mut try_variants: Vec<TokenStream> =
                     Vec::with_capacity(data_enum.variants.len());
 
-                let mut is_first = true;
-
                 for variant in &data_enum.variants {
                     let ident = &variant.ident;
-                    let var = if is_first {
-                        is_first = false;
-                        quote! {
-                            if #name::#ident == u {
-                                #name::#ident
-                            }
-                        }
-                    } else {
-                        quote! {
-                            else if #name::#ident == u {
-                                #name::#ident
-                            }
-                        }
+                    let var = quote! {
+                        u if #name::#ident == u => #name::#ident,
                     };
                     variants.push(var);
                     try_variants.push(quote! {
@@ -166,9 +153,9 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     impl primitive_enum::UnsafeFromU8 for #name {
                         #[inline]
                         fn from_unsafe(u: u8) -> Self {
-                            #(#variants)*
-                            else {
-                                panic!("UnsafeFromU8 from_unsafe undefined value: {}", u);
+                            match u {
+                                #(#variants)*
+                                _ => panic!("UnsafeFromU8 from_unsafe undefined value: {}", u),
                             }
                         }
                         #[inline]
