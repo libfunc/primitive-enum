@@ -50,47 +50,48 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
                 panic!("PrimitiveFromEnum only for non simple enum allow");
             } else {
                 let (primitive_name, primitive_name_s) = get_primitive_name(&ast);
-                let mut variants_names: Vec<(TokenStream, Option<Field>)> =
-                    Vec::with_capacity(data_enum.variants.len());
+
+                let len = data_enum.variants.len();
+
+                let mut get_primitive_enum: Vec<TokenStream> = Vec::with_capacity(len);
 
                 for variant in &data_enum.variants {
-                    if variant.discriminant.is_some() {
-                        // why? because discriminant number may not be equal to primitive number
-                        panic!("enums variants with discriminant not support in current moment");
-                    }
-                    let fields = &variant.fields;
-                    let fields = match fields {
-                        Fields::Unit => None,
+                    let variant_name = &variant.ident;
+
+                    match &variant.fields {
+                        Fields::Unit => {
+                            get_primitive_enum.push(quote! {
+                                #name::#variant_name => #primitive_name::#variant_name,
+                            });
+                        }
                         Fields::Unnamed(fields) => {
                             let len = fields.unnamed.len();
-                            if len != 1 {
-                                panic!("enums variants is currently support only with 1 unnamed fields");
+                            if len == 1 {
+                                get_primitive_enum.push(quote! {
+                                    #name::#variant_name(_) => #primitive_name::#variant_name,
+                                });
+                            } else {
+                                let underscores = vec![quote! { ,_ }; len - 1];
+                                get_primitive_enum.push(quote! {
+                                    #name::#variant_name(_ #(#underscores)*) => #primitive_name::#variant_name,
+                                });
                             }
-                            let field = fields.unnamed.first().unwrap();
-                            Some(field.clone())
                         }
-                        Fields::Named(_) => {
-                            panic!("enums named variants is currently not support");
+                        Fields::Named(fields) => {
+                            let fields = &fields
+                                .named
+                                .iter()
+                                .map(|f| {
+                                    let ident = f.ident.clone();
+                                    quote! { #ident: _, }
+                                })
+                                .collect::<Vec<_>>();
+                            get_primitive_enum.push(quote! {
+                                #name::#variant_name{ #(#fields)*} => #primitive_name::#variant_name,
+                            });
                         }
                     };
-                    let variant_name = &variant.ident;
-                    variants_names.push((variant_name.to_token_stream(), fields));
                 }
-
-                let get_primitive_enum: Vec<TokenStream> = variants_names
-                    .iter()
-                    .map(|(variant_name, inner)| {
-                        if inner.is_some() {
-                            quote! {
-                                #name::#variant_name(_) => #primitive_name::#variant_name,
-                            }
-                        } else {
-                            quote! {
-                                #name::#variant_name => #primitive_name::#variant_name,
-                            }
-                        }
-                    })
-                    .collect();
 
                 let gen = quote! {
                     impl primitive_enum::PrimitiveFromEnum for #name {
@@ -180,6 +181,29 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
         }
         _ => {
             panic!("FromU8 only for enum allow");
+        }
+    }
+}
+
+#[proc_macro_derive(GetVariantId, attributes(idx))]
+pub fn variant_id(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = parse_macro_input!(stream as DeriveInput);
+
+    let name = &ast.ident;
+    let data = &ast.data;
+
+    match data {
+        Data::Enum(data_enum) => {
+            let is_simple_enum = data_enum.variants.iter().all(|item| item.fields.is_empty());
+
+            if is_simple_enum {
+                panic!("GetVariantId only for non simple enum allow");
+            } else {
+                unimplemented!()
+            }
+        }
+        _ => {
+            panic!("PrimitiveFromEnum only for enum allow");
         }
     }
 }
