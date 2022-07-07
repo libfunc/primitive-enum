@@ -4,7 +4,7 @@ extern crate syn;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, Data, DeriveInput, Field, Fields, Ident, Lit, Meta};
+use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, Meta};
 
 fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
     ast.attrs
@@ -181,29 +181,6 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
         }
         _ => {
             panic!("FromU8 only for enum allow");
-        }
-    }
-}
-
-#[proc_macro_derive(GetVariantId, attributes(idx))]
-pub fn variant_id(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ast = parse_macro_input!(stream as DeriveInput);
-
-    let name = &ast.ident;
-    let data = &ast.data;
-
-    match data {
-        Data::Enum(data_enum) => {
-            let is_simple_enum = data_enum.variants.iter().all(|item| item.fields.is_empty());
-
-            if is_simple_enum {
-                panic!("GetVariantId only for non simple enum allow");
-            } else {
-                unimplemented!()
-            }
-        }
-        _ => {
-            panic!("PrimitiveFromEnum only for enum allow");
         }
     }
 }
