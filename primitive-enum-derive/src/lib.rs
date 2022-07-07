@@ -4,7 +4,7 @@ extern crate syn;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, MetaNameValue};
+use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, Meta};
 
 fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
     ast.attrs
@@ -14,11 +14,8 @@ fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
                 if segment.ident != "primitive" {
                     return None;
                 }
-                match attr.parse_args::<MetaNameValue>() {
-                    Ok(name_value) => {
-                        if name_value.path.to_token_stream().to_string() != "name" {
-                            return None;
-                        }
+                match attr.parse_meta() {
+                    Ok(Meta::NameValue(name_value)) => {
                         if let Lit::Str(litstr) = name_value.lit {
                             let s = litstr.parse::<Ident>().unwrap();
                             let value = s.to_token_stream();
@@ -27,6 +24,7 @@ fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
                             None
                         }
                     }
+                    Ok(_) => None,
                     Err(_) => None,
                 }
             })
@@ -86,7 +84,7 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
                                 })
                                 .collect::<Vec<_>>();
                             get_primitive_enum.push(quote! {
-                                #name::#variant_name{ #(#fields)*} => #primitive_name::#variant_name,
+                                #name::#variant_name{ #(#fields)* } => #primitive_name::#variant_name,
                             });
                         }
                     };
