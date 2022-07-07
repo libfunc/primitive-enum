@@ -82,7 +82,7 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
                                 .named
                                 .iter()
                                 .map(|f| {
-                                    let ident = f.ident.clone();
+                                    let ident = f.ident.as_ref().unwrap();
                                     quote! { #ident: _, }
                                 })
                                 .collect::<Vec<_>>();
