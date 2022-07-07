@@ -4,19 +4,19 @@ extern crate syn;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, Meta};
+use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, MetaNameValue};
 
 fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
     ast.attrs
         .iter()
         .find_map(|attr| {
             attr.path.segments.first().and_then(|segment| {
-                if segment.ident != "coming" {
+                if segment.ident != "primitive" {
                     return None;
                 }
-                match attr.parse_args::<Meta>() {
-                    Ok(Meta::NameValue(name_value)) => {
-                        if name_value.path.to_token_stream().to_string() != "primitive" {
+                match attr.parse_args::<MetaNameValue>() {
+                    Ok(name_value) => {
+                        if name_value.path.to_token_stream().to_string() != "name" {
                             return None;
                         }
                         if let Lit::Str(litstr) = name_value.lit {
@@ -27,7 +27,6 @@ fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
                             None
                         }
                     }
-                    Ok(_) => None,
                     Err(_) => None,
                 }
             })
@@ -35,7 +34,7 @@ fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
         .expect("complex enums must include primitive type name!")
 }
 
-#[proc_macro_derive(PrimitiveFromEnum, attributes(coming))]
+#[proc_macro_derive(PrimitiveFromEnum, attributes(primitive))]
 pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(stream as DeriveInput);
 
@@ -118,7 +117,7 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
     }
 }
 
-#[proc_macro_derive(FromU8, attributes(coming))]
+#[proc_macro_derive(FromU8, attributes(primitive))]
 pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(stream as DeriveInput);
 
