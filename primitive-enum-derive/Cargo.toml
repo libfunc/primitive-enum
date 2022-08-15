@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 homepage = "https://github.com/libfunc/primitive-enum/"
 documentation = "https://docs.rs/primitive-enum-derive/"
 repository = "https://github.com/libfunc/primitive-enum/"
-readme = "README.md"
+readme = "../README.md"
 edition = "2021"
 
 [lib]
