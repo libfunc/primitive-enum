@@ -20,8 +20,6 @@ path = "src/lib.rs"
 default = ["std"]
 std = []
 
-[dependencies.primitive-enum-derive]
-path = "../primitive-enum-derive"
-
 [dependencies]
 thiserror = "1.0"
+primitive-enum-derive = "0.1.0"
