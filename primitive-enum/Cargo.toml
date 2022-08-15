@@ -1,5 +1,5 @@
 [package]
-name = "primitive-enum"
+name = "primitive-from-enum"
 version = "0.1.0"
 authors = ["Rail Khusnutdinov <mail@rail-ka.ru>"]
 description = "macros for get primitive enum from complex"
