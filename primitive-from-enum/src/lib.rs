@@ -6,14 +6,17 @@ use std::{error::Error, fmt};
 /**
 Need for complex Enums, which includes other data:
 ```
+use primitive_enum::{PrimitiveFromEnum, FromU8};
+
 #[derive(PrimitiveFromEnum)]
-#[coming(primitive = "Primitive")]
+#[primitive = "Primitive"]
 enum Complex {
     A(String),
     B(u32),
     C
 }
-#[derive(FromU8)]
+#[derive(FromU8, Clone, Copy)]
+#[repr(u8)]
 enum Primitive {
     A,
     B,
