@@ -150,7 +150,7 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     }
                     impl primitive_enum::UnsafeFromU8 for #name {
                         #[inline]
-                        fn from_unsafe(u: u8) -> Self {
+                        unsafe fn from_unsafe(u: u8) -> Self {
                             match u {
                                 #(#variants)*
                                 _ => panic!("UnsafeFromU8 from_unsafe undefined value: {}", u),
