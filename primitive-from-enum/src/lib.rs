@@ -9,7 +9,7 @@ Need for complex Enums, which includes other data:
 use primitive_enum::{PrimitiveFromEnum, FromU8};
 
 #[derive(PrimitiveFromEnum)]
-#[primitive = "Primitive"]
+#[primitive(Primitive)]
 enum Complex {
     A(String),
     B(u32),

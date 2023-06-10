@@ -3,35 +3,26 @@ extern crate quote;
 extern crate syn;
 
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
-use syn::{parse_macro_input, Data, DeriveInput, Fields, Ident, Lit, Meta};
+use quote::quote;
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Fields, Ident};
 
-fn get_primitive_name(ast: &DeriveInput) -> (TokenStream, String) {
-    ast.attrs
+fn get_primitive_name(attrs: &[Attribute]) -> (Ident, String) {
+    attrs
         .iter()
         .find_map(|attr| {
-            attr.path.segments.first().and_then(|segment| {
-                if segment.ident != "primitive" {
-                    return None;
-                }
-                match attr.parse_meta() {
-                    Ok(Meta::NameValue(name_value)) => {
-                        if let Lit::Str(litstr) = name_value.lit {
-                            let s = litstr.parse::<Ident>().unwrap();
-                            let value = s.to_token_stream();
-                            Some((value, s.to_string()))
-                        } else {
-                            None
-                        }
-                    }
-                    Ok(_) => None,
-                    Err(_) => None,
-                }
-            })
+            if !attr.path().is_ident("primitive") {
+                return None;
+            }
+
+            let ident: Ident = attr.parse_args().unwrap();
+            let name = ident.to_string();
+
+            Some((ident.clone(), name))
         })
-        .expect("complex enums must include primitive type name!")
+        .expect("complex enums must include primitive type name")
 }
 
+/// #[primitive = PrimitiveName]
 #[proc_macro_derive(PrimitiveFromEnum, attributes(primitive))]
 pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(stream as DeriveInput);
@@ -46,7 +37,7 @@ pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro
             if is_simple_enum {
                 panic!("PrimitiveFromEnum only for non simple enum allow");
             } else {
-                let (primitive_name, primitive_name_s) = get_primitive_name(&ast);
+                let (primitive_name, primitive_name_s) = get_primitive_name(&ast.attrs);
 
                 let len = data_enum.variants.len();
 

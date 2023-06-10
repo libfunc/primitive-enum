@@ -22,4 +22,4 @@ std = []
 
 [dependencies]
 thiserror = "1.0"
-primitive-enum-derive = "0.2.0"
+primitive-enum-derive = "0.3.0"
