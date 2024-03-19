@@ -35,6 +35,9 @@ pub trait PrimitiveFromEnum {
 }
 
 pub trait UnsafeFromU8: PartialEq<u8> + Sized {
+    /// # Safety
+    ///
+    /// This function is unsafe because there is no guarantee that the value is valid
     unsafe fn from_unsafe(_: u8) -> Self;
 
     // get enum name in string format

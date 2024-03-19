@@ -17,12 +17,12 @@ fn get_primitive_name(attrs: &[Attribute]) -> (Ident, String) {
             let ident: Ident = attr.parse_args().unwrap();
             let name = ident.to_string();
 
-            Some((ident.clone(), name))
+            Some((ident, name))
         })
         .expect("complex enums must include primitive type name")
 }
 
-/// #[primitive = PrimitiveName]
+/// #[primitive(PrimitiveName)]
 #[proc_macro_derive(PrimitiveFromEnum, attributes(primitive))]
 pub fn derive_primitive_from_enum(stream: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = parse_macro_input!(stream as DeriveInput);
@@ -137,6 +137,11 @@ pub fn derive_from_u8(stream: proc_macro::TokenStream) -> proc_macro::TokenStrea
                     impl PartialEq<u8> for #name {
                         fn eq(&self, other: &u8) -> bool {
                             *self as u8 == *other
+                        }
+                    }
+                    impl From<#name> for u8 {
+                        fn from(e: #name) -> u8 {
+                            e as u8
                         }
                     }
                     impl primitive_enum::UnsafeFromU8 for #name {
